@@ -1,0 +1,1862 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FitCore — Gym Management System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600&display=swap"
+    rel="stylesheet" />
+  <style>
+    /* ── TOKENS ── */
+    :root {
+      --navy: #0A2647;
+      --cyan: #00C2FF;
+      --cyan-dark: #0097C7;
+      --white: #FFFFFF;
+      --bg: #F5F7FA;
+      --text: #102A43;
+      --text-muted: #4A6580;
+      --card: #FFFFFF;
+      --shadow: 0 4px 24px rgba(10, 38, 71, .10);
+      --radius: 12px;
+    }
+
+    /* ── RESET ── */
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      overflow-x: hidden;
+    }
+
+    img {
+      max-width: 100%;
+      display: block;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    /* ── TYPOGRAPHY ── */
+    .display {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 800;
+      line-height: 1.05;
+      letter-spacing: -.5px;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      background: var(--navy);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 5vw;
+      height: 68px;
+      box-shadow: 0 2px 20px rgba(0, 0, 0, .25);
+      transition: background .3s;
+    }
+
+    .nav-logo {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 800;
+      font-size: 1.6rem;
+      letter-spacing: 1px;
+      color: var(--white);
+    }
+
+    .nav-logo span {
+      color: var(--cyan);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+    }
+
+    .nav-links a {
+      color: rgba(255, 255, 255, .8);
+      font-size: .9rem;
+      font-weight: 500;
+      transition: color .2s;
+    }
+
+    .nav-links a:hover {
+      color: var(--cyan);
+    }
+
+    .nav-cta {
+      background: var(--cyan);
+      color: var(--navy);
+      font-weight: 700;
+      padding: .5rem 1.3rem;
+      border-radius: 6px;
+      font-size: .9rem;
+      transition: background .2s, transform .15s;
+    }
+
+    .nav-cta:hover {
+      background: var(--cyan-dark);
+      color: var(--white);
+      transform: translateY(-1px);
+    }
+
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+    }
+
+    .hamburger span {
+      width: 24px;
+      height: 2px;
+      background: var(--white);
+      border-radius: 2px;
+      transition: .3s;
+    }
+
+    .mobile-menu {
+      display: none;
+      flex-direction: column;
+      gap: 1rem;
+      background: var(--navy);
+      padding: 1.5rem 5vw;
+      position: fixed;
+      top: 68px;
+      left: 0;
+      right: 0;
+      z-index: 99;
+    }
+
+    .mobile-menu a {
+      color: rgba(255, 255, 255, .85);
+      font-size: 1rem;
+      font-weight: 500;
+    }
+
+    .mobile-menu.open {
+      display: flex;
+    }
+
+    /* ── HERO ── */
+    #hero {
+      min-height: 100vh;
+      background: linear-gradient(135deg, var(--navy) 0%, #0d3563 60%, #0e4080 100%);
+      display: flex;
+      align-items: center;
+      padding: 120px 5vw 80px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    #hero::before {
+      content: '';
+      position: absolute;
+      top: -100px;
+      right: -120px;
+      width: 700px;
+      height: 700px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(0, 194, 255, .15) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    #hero::after {
+      content: '';
+      position: absolute;
+      bottom: -80px;
+      left: -80px;
+      width: 400px;
+      height: 400px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(0, 194, 255, .08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+    }
+
+    .hero-label {
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      background: rgba(0, 194, 255, .15);
+      border: 1px solid rgba(0, 194, 255, .3);
+      color: var(--cyan);
+      font-size: .8rem;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: .4rem 1rem;
+      border-radius: 20px;
+      margin-bottom: 1.4rem;
+    }
+
+    .hero-label::before {
+      content: '';
+      width: 8px;
+      height: 8px;
+      background: var(--cyan);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1)
+      }
+
+      50% {
+        opacity: .5;
+        transform: scale(1.4)
+      }
+    }
+
+    .hero-title {
+      font-size: clamp(2.8rem, 5vw, 4.5rem);
+      color: var(--white);
+      margin-bottom: 1.2rem;
+    }
+
+    .hero-title em {
+      color: var(--cyan);
+      font-style: normal;
+      display: block;
+    }
+
+    .hero-sub {
+      color: rgba(255, 255, 255, .72);
+      font-size: 1.1rem;
+      line-height: 1.7;
+      margin-bottom: 2.2rem;
+      max-width: 480px;
+    }
+
+    .hero-btns {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      background: var(--cyan);
+      color: var(--navy);
+      font-weight: 700;
+      font-size: 1rem;
+      padding: .85rem 2rem;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      transition: background .2s, transform .15s, box-shadow .2s;
+      box-shadow: 0 4px 20px rgba(0, 194, 255, .35);
+    }
+
+    .btn-primary:hover {
+      background: var(--cyan-dark);
+      color: var(--white);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(0, 194, 255, .45);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--white);
+      font-weight: 600;
+      font-size: 1rem;
+      padding: .85rem 2rem;
+      border-radius: 8px;
+      border: 2px solid rgba(255, 255, 255, .35);
+      cursor: pointer;
+      transition: border-color .2s, color .2s, transform .15s;
+    }
+
+    .btn-outline:hover {
+      border-color: var(--cyan);
+      color: var(--cyan);
+      transform: translateY(-2px);
+    }
+
+    .hero-stats {
+      display: flex;
+      gap: 2rem;
+      margin-top: 2.5rem;
+      flex-wrap: wrap;
+    }
+
+    .stat {
+      text-align: center;
+    }
+
+    .stat-n {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 800;
+      font-size: 2.2rem;
+      color: var(--cyan);
+      line-height: 1;
+    }
+
+    .stat-l {
+      font-size: .78rem;
+      color: rgba(255, 255, 255, .55);
+      margin-top: .3rem;
+      text-transform: uppercase;
+      letter-spacing: .8px;
+    }
+
+    /* Hero visual */
+    .hero-visual {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .dashboard-mock {
+      background: rgba(255, 255, 255, .06);
+      border: 1px solid rgba(255, 255, 255, .12);
+      backdrop-filter: blur(8px);
+      border-radius: 16px;
+      padding: 1.5rem;
+      width: 100%;
+      max-width: 440px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, .35);
+    }
+
+    .mock-topbar {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+      margin-bottom: 1.2rem;
+    }
+
+    .mock-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    .mock-dot:nth-child(1) {
+      background: #ff5f57
+    }
+
+    .mock-dot:nth-child(2) {
+      background: #febc2e
+    }
+
+    .mock-dot:nth-child(3) {
+      background: #28c840
+    }
+
+    .mock-title {
+      color: rgba(255, 255, 255, .6);
+      font-size: .8rem;
+      margin-left: .5rem;
+    }
+
+    .mock-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: .8rem;
+      margin-bottom: .8rem;
+    }
+
+    .mock-card {
+      background: rgba(255, 255, 255, .08);
+      border-radius: 10px;
+      padding: 1rem;
+      border: 1px solid rgba(255, 255, 255, .1);
+    }
+
+    .mock-card .mc-label {
+      font-size: .7rem;
+      color: rgba(255, 255, 255, .5);
+      margin-bottom: .4rem;
+      text-transform: uppercase;
+      letter-spacing: .6px;
+    }
+
+    .mock-card .mc-val {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--white);
+    }
+
+    .mock-card .mc-up {
+      font-size: .7rem;
+      color: #4ade80;
+      margin-top: .2rem;
+    }
+
+    .mock-bar-section {
+      margin-top: .4rem;
+    }
+
+    .mock-bar-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: .7rem;
+      color: rgba(255, 255, 255, .5);
+      margin-bottom: .4rem;
+    }
+
+    .mock-bar-track {
+      background: rgba(255, 255, 255, .1);
+      border-radius: 4px;
+      height: 6px;
+      margin-bottom: .5rem;
+      overflow: hidden;
+    }
+
+    .mock-bar-fill {
+      height: 100%;
+      border-radius: 4px;
+      background: linear-gradient(90deg, var(--cyan), var(--cyan-dark));
+    }
+
+    .mock-members {
+      margin-top: .8rem;
+    }
+
+    .mock-member {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+      padding: .4rem 0;
+      border-bottom: 1px solid rgba(255, 255, 255, .06);
+    }
+
+    .mock-member:last-child {
+      border-bottom: none;
+    }
+
+    .mock-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--cyan), var(--cyan-dark));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .7rem;
+      font-weight: 700;
+      color: var(--navy);
+      flex-shrink: 0;
+    }
+
+    .mock-name {
+      font-size: .75rem;
+      color: rgba(255, 255, 255, .8);
+      flex: 1;
+    }
+
+    .mock-badge {
+      font-size: .65rem;
+      font-weight: 600;
+      padding: .15rem .5rem;
+      border-radius: 20px;
+    }
+
+    .badge-active {
+      background: rgba(74, 222, 128, .15);
+      color: #4ade80;
+    }
+
+    .badge-new {
+      background: rgba(0, 194, 255, .15);
+      color: var(--cyan);
+    }
+
+    .float-badge {
+      position: absolute;
+      bottom: -20px;
+      left: -20px;
+      background: var(--white);
+      border-radius: 12px;
+      padding: .8rem 1.2rem;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, .2);
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+      animation: floatUp 3s ease-in-out infinite;
+    }
+
+    @keyframes floatUp {
+
+      0%,
+      100% {
+        transform: translateY(0)
+      }
+
+      50% {
+        transform: translateY(-8px)
+      }
+    }
+
+    .float-icon {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, #0A2647, #0d3563);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .float-icon svg {
+      width: 18px;
+      height: 18px;
+      fill: none;
+      stroke: var(--cyan);
+      stroke-width: 2;
+    }
+
+    .float-text .ft-val {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: var(--navy);
+    }
+
+    .float-text .ft-sub {
+      font-size: .7rem;
+      color: var(--text-muted);
+    }
+
+    /* ── SECTION COMMON ── */
+    section {
+      padding: 90px 5vw;
+    }
+
+    .section-label {
+      font-size: .8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--cyan);
+      margin-bottom: .6rem;
+    }
+
+    .section-title {
+      font-size: clamp(2rem, 3.5vw, 2.8rem);
+      color: var(--navy);
+      margin-bottom: 1rem;
+    }
+
+    .section-sub {
+      font-size: 1.05rem;
+      color: var(--text-muted);
+      line-height: 1.7;
+      max-width: 560px;
+    }
+
+    .inner {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* ── FEATURES ── */
+    #features {
+      background: var(--white);
+    }
+
+    .features-header {
+      text-align: center;
+      margin-bottom: 3.5rem;
+    }
+
+    .features-header .section-sub {
+      margin: 0 auto;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .feat-card {
+      background: var(--bg);
+      border-radius: var(--radius);
+      padding: 2rem;
+      border: 1px solid rgba(10, 38, 71, .07);
+      transition: box-shadow .25s, transform .25s, border-color .25s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .feat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--cyan), var(--cyan-dark));
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform .3s;
+    }
+
+    .feat-card:hover {
+      box-shadow: var(--shadow);
+      transform: translateY(-4px);
+      border-color: rgba(0, 194, 255, .2);
+    }
+
+    .feat-card:hover::before {
+      transform: scaleX(1);
+    }
+
+    .feat-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(0, 194, 255, .15), rgba(0, 194, 255, .05));
+      border: 1px solid rgba(0, 194, 255, .2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.2rem;
+    }
+
+    .feat-icon svg {
+      width: 24px;
+      height: 24px;
+      stroke: var(--cyan);
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .feat-title {
+      font-weight: 700;
+      font-size: 1.05rem;
+      color: var(--navy);
+      margin-bottom: .5rem;
+    }
+
+    .feat-desc {
+      font-size: .9rem;
+      color: var(--text-muted);
+      line-height: 1.65;
+    }
+
+    /* ── HOW IT WORKS ── */
+    #how {
+      background: var(--bg);
+    }
+
+    .how-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5rem;
+      align-items: center;
+    }
+
+    .steps {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    .step {
+      display: flex;
+      gap: 1.2rem;
+      align-items: flex-start;
+    }
+
+    .step-num {
+      flex-shrink: 0;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--navy);
+      color: var(--cyan);
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 800;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid rgba(0, 194, 255, .3);
+    }
+
+    .step-body h4 {
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: .3rem;
+    }
+
+    .step-body p {
+      font-size: .9rem;
+      color: var(--text-muted);
+      line-height: 1.65;
+    }
+
+    .how-visual {
+      position: relative;
+    }
+
+    .how-card {
+      background: var(--navy);
+      border-radius: 16px;
+      padding: 2rem;
+      color: var(--white);
+      box-shadow: 0 20px 50px rgba(10, 38, 71, .3);
+    }
+
+    .how-card-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--cyan);
+      margin-bottom: 1.2rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .schedule-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      background: rgba(255, 255, 255, .06);
+      border-radius: 8px;
+      padding: .7rem 1rem;
+      margin-bottom: .6rem;
+      border: 1px solid rgba(255, 255, 255, .08);
+      transition: background .2s;
+    }
+
+    .schedule-row:hover {
+      background: rgba(0, 194, 255, .1);
+    }
+
+    .sch-time {
+      font-size: .75rem;
+      color: var(--cyan);
+      font-weight: 600;
+      min-width: 55px;
+    }
+
+    .sch-class {
+      font-size: .85rem;
+      color: var(--white);
+      flex: 1;
+    }
+
+    .sch-spots {
+      font-size: .72rem;
+      color: rgba(255, 255, 255, .45);
+    }
+
+    .sch-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .dot-full {
+      background: #f87171
+    }
+
+    .dot-avail {
+      background: #4ade80
+    }
+
+    .dot-almost {
+      background: #fbbf24
+    }
+
+    /* ── MEMBERSHIP ── */
+    #membership {
+      background: var(--white);
+    }
+
+    .plans-header {
+      text-align: center;
+      margin-bottom: 3.5rem;
+    }
+
+    .plans-header .section-sub {
+      margin: 0 auto;
+    }
+
+    .plans-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .plan-card {
+      border-radius: var(--radius);
+      padding: 2.2rem;
+      border: 2px solid rgba(10, 38, 71, .1);
+      background: var(--card);
+      transition: transform .25s, box-shadow .25s;
+      position: relative;
+    }
+
+    .plan-card:hover {
+      transform: translateY(-6px);
+      box-shadow: var(--shadow);
+    }
+
+    .plan-card.featured {
+      background: var(--navy);
+      border-color: var(--cyan);
+    }
+
+    .plan-popular {
+      position: absolute;
+      top: -14px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--cyan);
+      color: var(--navy);
+      font-size: .72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: .3rem 1rem;
+      border-radius: 20px;
+    }
+
+    .plan-name {
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: .5rem;
+    }
+
+    .plan-card.featured .plan-name {
+      color: var(--cyan);
+    }
+
+    .plan-price {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 800;
+      font-size: 3rem;
+      color: var(--navy);
+      line-height: 1;
+      margin-bottom: .3rem;
+    }
+
+    .plan-price sup {
+      font-size: 1.5rem;
+      vertical-align: top;
+      margin-top: .5rem;
+    }
+
+    .plan-price sub {
+      font-size: 1rem;
+      font-weight: 500;
+    }
+
+    .plan-card.featured .plan-price {
+      color: var(--white);
+    }
+
+    .plan-desc {
+      font-size: .85rem;
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+    }
+
+    .plan-card.featured .plan-desc {
+      color: rgba(255, 255, 255, .55);
+    }
+
+    .plan-features {
+      list-style: none;
+      margin-bottom: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: .7rem;
+    }
+
+    .plan-features li {
+      font-size: .9rem;
+      color: var(--text);
+      display: flex;
+      gap: .6rem;
+      align-items: flex-start;
+    }
+
+    .plan-card.featured .plan-features li {
+      color: rgba(255, 255, 255, .8);
+    }
+
+    .plan-features li::before {
+      content: '✓';
+      color: var(--cyan);
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: .05rem;
+    }
+
+    .plan-btn {
+      width: 100%;
+      padding: .9rem;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: .95rem;
+      border: 2px solid var(--cyan);
+      background: transparent;
+      color: var(--navy);
+      cursor: pointer;
+      transition: .2s;
+    }
+
+    .plan-btn:hover {
+      background: var(--cyan);
+      color: var(--navy);
+    }
+
+    .plan-card.featured .plan-btn {
+      background: var(--cyan);
+      color: var(--navy);
+    }
+
+    .plan-card.featured .plan-btn:hover {
+      background: var(--cyan-dark);
+      color: var(--white);
+    }
+
+    /* ── TESTIMONIALS ── */
+    #testimonials {
+      background: var(--bg);
+    }
+
+    .test-header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .test-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .test-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 2rem;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(10, 38, 71, .06);
+      transition: transform .25s;
+    }
+
+    .test-card:hover {
+      transform: translateY(-4px);
+    }
+
+    .test-stars {
+      color: #f59e0b;
+      font-size: 1rem;
+      margin-bottom: 1rem;
+      letter-spacing: 2px;
+    }
+
+    .test-text {
+      font-size: .95rem;
+      color: var(--text-muted);
+      line-height: 1.7;
+      margin-bottom: 1.5rem;
+      font-style: italic;
+    }
+
+    .test-author {
+      display: flex;
+      align-items: center;
+      gap: .8rem;
+    }
+
+    .test-avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--navy), #0d3563);
+      color: var(--cyan);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: .9rem;
+    }
+
+    .test-name {
+      font-weight: 700;
+      color: var(--navy);
+      font-size: .9rem;
+    }
+
+    .test-role {
+      font-size: .78rem;
+      color: var(--text-muted);
+    }
+
+    /* ── CTA BANNER ── */
+    #cta {
+      background: linear-gradient(135deg, var(--navy), #0e4080);
+      padding: 90px 5vw;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    #cta::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at center, rgba(0, 194, 255, .12) 0%, transparent 70%);
+    }
+
+    #cta .section-title {
+      color: var(--white);
+      font-size: clamp(2rem, 4vw, 3rem);
+      position: relative;
+    }
+
+    #cta .section-sub {
+      color: rgba(255, 255, 255, .65);
+      margin: 1rem auto 2.5rem;
+      position: relative;
+    }
+
+    .cta-form {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      position: relative;
+      max-width: 560px;
+      margin: 0 auto;
+    }
+
+    .cta-input {
+      flex: 1;
+      min-width: 220px;
+      padding: .9rem 1.2rem;
+      border-radius: 8px;
+      border: 2px solid rgba(255, 255, 255, .2);
+      background: rgba(255, 255, 255, .1);
+      color: var(--white);
+      font-size: .95rem;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+      transition: border-color .2s;
+    }
+
+    .cta-input::placeholder {
+      color: rgba(255, 255, 255, .45);
+    }
+
+    .cta-input:focus {
+      border-color: var(--cyan);
+    }
+
+    .cta-submit {
+      background: var(--cyan);
+      color: var(--navy);
+      font-weight: 700;
+      font-size: .95rem;
+      padding: .9rem 1.8rem;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      transition: background .2s, transform .15s;
+      white-space: nowrap;
+    }
+
+    .cta-submit:hover {
+      background: var(--cyan-dark);
+      color: var(--white);
+      transform: translateY(-1px);
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--navy);
+      color: rgba(255, 255, 255, .6);
+      padding: 60px 5vw 30px;
+    }
+
+    .footer-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 2.5rem;
+      padding-bottom: 2.5rem;
+      border-bottom: 1px solid rgba(255, 255, 255, .1);
+    }
+
+    .footer-brand .nav-logo {
+      font-size: 1.4rem;
+      margin-bottom: 1rem;
+      display: inline-block;
+    }
+
+    .footer-brand p {
+      font-size: .88rem;
+      line-height: 1.7;
+      max-width: 280px;
+    }
+
+    .footer-col h5 {
+      color: var(--white);
+      font-weight: 700;
+      font-size: .9rem;
+      margin-bottom: 1rem;
+    }
+
+    .footer-col ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: .55rem;
+    }
+
+    .footer-col ul li a {
+      font-size: .88rem;
+      color: rgba(255, 255, 255, .55);
+      transition: color .2s;
+    }
+
+    .footer-col ul li a:hover {
+      color: var(--cyan);
+    }
+
+    .footer-bottom {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding-top: 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: .82rem;
+      flex-wrap: wrap;
+      gap: .8rem;
+    }
+
+    .footer-bottom a {
+      color: var(--cyan);
+    }
+
+    .social-links {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .social-links a {
+      color: rgba(255, 255, 255, .55);
+      transition: color .2s;
+      font-size: .85rem;
+      font-weight: 500;
+    }
+
+    .social-links a:hover {
+      color: var(--cyan);
+    }
+
+    /* ── SCROLL ANIMATION ── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity .6s ease, transform .6s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .reveal-delay-1 {
+      transition-delay: .1s;
+    }
+
+    .reveal-delay-2 {
+      transition-delay: .2s;
+    }
+
+    .reveal-delay-3 {
+      transition-delay: .3s;
+    }
+
+    .reveal-delay-4 {
+      transition-delay: .4s;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .hero-inner {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-visual {
+        display: none;
+      }
+
+      .how-inner {
+        grid-template-columns: 1fr;
+      }
+
+      .footer-inner {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .nav-links {
+        display: none;
+      }
+
+      .hamburger {
+        display: flex;
+      }
+
+      .hero-stats {
+        gap: 1.2rem;
+      }
+
+      .footer-inner {
+        grid-template-columns: 1fr;
+      }
+
+      .footer-bottom {
+        flex-direction: column;
+        text-align: center;
+      }
+    }
+
+    /* ── TOAST ── */
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      z-index: 999;
+      background: var(--navy);
+      color: var(--white);
+      border-left: 4px solid var(--cyan);
+      padding: 1rem 1.5rem;
+      border-radius: 8px;
+      font-size: .9rem;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, .2);
+      transform: translateX(120%);
+      transition: transform .35s cubic-bezier(.34, 1.56, .64, 1);
+    }
+
+    .toast.show {
+      transform: translateX(0);
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- NAV -->
+  <nav id="navbar">
+    <span class="nav-logo">Fit<span>Core</span></span>
+    <div class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#how">How It Works</a>
+      <a href="#membership">Pricing</a>
+      <a href="#testimonials">Reviews</a>
+      <a href="#cta" class="nav-cta">Get Started</a>
+    </div>
+    <div class="hamburger" id="ham" onclick="toggleMenu()">
+      <span></span><span></span><span></span>
+    </div>
+  </nav>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#features" onclick="toggleMenu()">Features</a>
+    <a href="#how" onclick="toggleMenu()">How It Works</a>
+    <a href="#membership" onclick="toggleMenu()">Pricing</a>
+    <a href="#testimonials" onclick="toggleMenu()">Reviews</a>
+    <a href="#cta" onclick="toggleMenu()" class="nav-cta" style="display:inline-block;width:fit-content">Get Started</a>
+  </div>
+
+  <!-- HERO -->
+  <section id="hero">
+    <div class="hero-inner">
+      <div class="hero-content">
+        <div class="hero-label">Next-Gen Gym Management</div>
+        <h1 class="display hero-title">
+          Run Your Gym.<em>Not Spreadsheets.</em>
+        </h1>
+        <p class="hero-sub">FitCore unifies member management, class scheduling, billing, and real-time analytics into
+          one powerful platform — so you can focus on what actually matters: your members.</p>
+        <div class="hero-btns">
+          <button class="btn-primary" onclick="scrollTo('#cta')">Start Free Trial</button>
+          <button class="btn-outline" onclick="scrollTo('#how')">Watch Demo</button>
+        </div>
+        <div class="hero-stats">
+          <div class="stat">
+            <div class="stat-n" id="ctr-members">0</div>
+            <div class="stat-l">Active Members</div>
+          </div>
+          <div class="stat" style="border-left:1px solid rgba(255,255,255,.15);padding-left:2rem">
+            <div class="stat-n" id="ctr-gyms">0</div>
+            <div class="stat-l">Gyms Powered</div>
+          </div>
+          <div class="stat" style="border-left:1px solid rgba(255,255,255,.15);padding-left:2rem">
+            <div class="stat-n" id="ctr-uptime">0</div>
+            <div class="stat-l">Uptime</div>
+          </div>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="dashboard-mock">
+          <div class="mock-topbar">
+            <div class="mock-dot"></div>
+            <div class="mock-dot"></div>
+            <div class="mock-dot"></div>
+            <span class="mock-title">FitCore Dashboard</span>
+          </div>
+          <div class="mock-grid">
+            <div class="mock-card">
+              <div class="mc-label">Members</div>
+              <div class="mc-val">1,284</div>
+              <div class="mc-up">↑ 12% this month</div>
+            </div>
+            <div class="mock-card">
+              <div class="mc-label">Revenue</div>
+              <div class="mc-val">₹4.2L</div>
+              <div class="mc-up">↑ 8% vs last mo.</div>
+            </div>
+          </div>
+          <div class="mock-bar-section">
+            <div class="mock-bar-label"><span>Capacity Usage</span><span>78%</span></div>
+            <div class="mock-bar-track">
+              <div class="mock-bar-fill" style="width:78%"></div>
+            </div>
+            <div class="mock-bar-label"><span>Class Attendance</span><span>91%</span></div>
+            <div class="mock-bar-track">
+              <div class="mock-bar-fill" style="width:91%"></div>
+            </div>
+            <div class="mock-bar-label"><span>Renewals</span><span>64%</span></div>
+            <div class="mock-bar-track">
+              <div class="mock-bar-fill" style="width:64%"></div>
+            </div>
+          </div>
+          <div class="mock-members">
+            <div class="mock-member">
+              <div class="mock-avatar">RP</div>
+              <div class="mock-name">Riya Patel</div>
+              <span class="mock-badge badge-active">Active</span>
+            </div>
+            <div class="mock-member">
+              <div class="mock-avatar">AK</div>
+              <div class="mock-name">Arjun Kumar</div>
+              <span class="mock-badge badge-new">New</span>
+            </div>
+            <div class="mock-member">
+              <div class="mock-avatar">SM</div>
+              <div class="mock-name">Sneha Mehta</div>
+              <span class="mock-badge badge-active">Active</span>
+            </div>
+          </div>
+        </div>
+        <div class="float-badge">
+          <div class="float-icon">
+            <svg viewBox="0 0 24 24">
+              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+            </svg>
+          </div>
+          <div class="float-text">
+            <div class="ft-val">+47 Check-ins</div>
+            <div class="ft-sub">Today so far</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section id="features">
+    <div class="inner">
+      <div class="features-header reveal">
+        <div class="section-label">What You Get</div>
+        <h2 class="display section-title">Everything Your Gym Needs</h2>
+        <p class="section-sub">From walk-in check-ins to automated renewals — every tool your team and your members
+          expect, in one clean interface.</p>
+      </div>
+      <div class="features-grid">
+        <div class="feat-card reveal reveal-delay-1">
+          <div class="feat-icon">
+            <svg viewBox="0 0 24 24">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg>
+          </div>
+          <div class="feat-title">Member Management</div>
+          <div class="feat-desc">Onboard new members in under 60 seconds. Track profiles, attendance history, and health
+            goals from a single unified view.</div>
+        </div>
+        <div class="feat-card reveal reveal-delay-2">
+          <div class="feat-icon">
+            <svg viewBox="0 0 24 24">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+              <line x1="16" y1="2" x2="16" y2="6" />
+              <line x1="8" y1="2" x2="8" y2="6" />
+              <line x1="3" y1="10" x2="21" y2="10" />
+            </svg>
+          </div>
+          <div class="feat-title">Class Scheduling</div>
+          <div class="feat-desc">Drag-and-drop timetable builder with capacity controls, waitlists, and automatic
+            notifications when a spot opens up.</div>
+        </div>
+        <div class="feat-card reveal reveal-delay-3">
+          <div class="feat-icon">
+            <svg viewBox="0 0 24 24">
+              <line x1="12" y1="1" x2="12" y2="23" />
+              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+            </svg>
+          </div>
+          <div class="feat-title">Billing & Payments</div>
+          <div class="feat-desc">Recurring billing, UPI / card payments, invoice generation, and automatic expiry
+            reminders — zero manual follow-ups.</div>
+        </div>
+        <div class="feat-card reveal reveal-delay-1">
+          <div class="feat-icon">
+            <svg viewBox="0 0 24 24">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+            </svg>
+          </div>
+          <div class="feat-title">Real-Time Analytics</div>
+          <div class="feat-desc">Live dashboards for revenue, attendance trends, peak hours, and churn risk — so
+            decisions are driven by data, not gut feel.</div>
+        </div>
+        <div class="feat-card reveal reveal-delay-2">
+          <div class="feat-icon">
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.15 12 19.79 19.79 0 0 1 1.05 3.4 2 2 0 0 1 3 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" />
+            </svg>
+          </div>
+          <div class="feat-title">Automated Notifications</div>
+          <div class="feat-desc">WhatsApp, SMS, and email alerts for upcoming renewals, class bookings, payment
+            confirmations, and promotional campaigns.</div>
+        </div>
+        <div class="feat-card reveal reveal-delay-3">
+          <div class="feat-icon">
+            <svg viewBox="0 0 24 24">
+              <rect x="5" y="2" width="14" height="20" rx="2" ry="2" />
+              <line x1="12" y1="18" x2="12.01" y2="18" />
+            </svg>
+          </div>
+          <div class="feat-title">Member App</div>
+          <div class="feat-desc">Branded mobile app so members can book classes, track workouts, view their invoices,
+            and connect with trainers — anytime.</div>
+        </div>
+        <div class="feat-card reveal reveal-delay-1">
+          <div class="feat-icon">
+            <svg viewBox="0 0 24 24">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+            </svg>
+          </div>
+          <div class="feat-title">Access Control</div>
+          <div class="feat-desc">QR-code and biometric turnstile integration that validates membership status instantly
+            at the entrance — no staff required.</div>
+        </div>
+        <div class="feat-card reveal reveal-delay-2">
+          <div class="feat-icon">
+            <svg viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="3" />
+              <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+              <path d="M4.93 4.93a10 10 0 0 0 0 14.14" />
+            </svg>
+          </div>
+          <div class="feat-title">Multi-Branch Support</div>
+          <div class="feat-desc">Manage all your locations from one account. Members roam freely between branches; you
+            see the full picture in one dashboard.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section id="how">
+    <div class="inner">
+      <div class="how-inner">
+        <div>
+          <div class="section-label reveal">Simple by Design</div>
+          <h2 class="display section-title reveal">Up & Running in a Day</h2>
+          <p class="section-sub reveal">No developer, no data migration headaches. Your gym is live before the day is
+            out.</p>
+          <div class="steps" style="margin-top:2.5rem">
+            <div class="step reveal reveal-delay-1">
+              <div class="step-num">01</div>
+              <div class="step-body">
+                <h4>Create Your Gym Profile</h4>
+                <p>Add your gym name, logo, working hours, and branch details. Takes five minutes — no technical
+                  knowledge needed.</p>
+              </div>
+            </div>
+            <div class="step reveal reveal-delay-2">
+              <div class="step-num">02</div>
+              <div class="step-body">
+                <h4>Import or Add Members</h4>
+                <p>Upload a CSV from your old system or start fresh. Each member gets a digital profile with photo,
+                  plan, and history.</p>
+              </div>
+            </div>
+            <div class="step reveal reveal-delay-3">
+              <div class="step-num">03</div>
+              <div class="step-body">
+                <h4>Set Up Classes & Plans</h4>
+                <p>Build your timetable, define membership tiers, and connect your payment gateway. Everything talks to
+                  everything automatically.</p>
+              </div>
+            </div>
+            <div class="step reveal reveal-delay-4">
+              <div class="step-num">04</div>
+              <div class="step-body">
+                <h4>Go Live & Grow</h4>
+                <p>Share your booking link with members, watch the dashboard fill up, and let automation handle the
+                  routine work.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="how-visual reveal">
+          <div class="how-card">
+            <div class="how-card-title">Today's Schedule</div>
+            <div class="schedule-row">
+              <span class="sch-time">6:00 AM</span>
+              <div class="sch-dot dot-full"></div>
+              <span class="sch-class">Morning Yoga — Studio A</span>
+              <span class="sch-spots">Full</span>
+            </div>
+            <div class="schedule-row">
+              <span class="sch-time">7:30 AM</span>
+              <div class="sch-dot dot-avail"></div>
+              <span class="sch-class">HIIT Circuit — Main Floor</span>
+              <span class="sch-spots">8 spots</span>
+            </div>
+            <div class="schedule-row">
+              <span class="sch-time">9:00 AM</span>
+              <div class="sch-dot dot-avail"></div>
+              <span class="sch-class">Zumba Fitness — Studio B</span>
+              <span class="sch-spots">12 spots</span>
+            </div>
+            <div class="schedule-row">
+              <span class="sch-time">11:00 AM</span>
+              <div class="sch-dot dot-almost"></div>
+              <span class="sch-class">Strength & Conditioning</span>
+              <span class="sch-spots">2 spots</span>
+            </div>
+            <div class="schedule-row">
+              <span class="sch-time">5:30 PM</span>
+              <div class="sch-dot dot-avail"></div>
+              <span class="sch-class">CrossFit Advanced</span>
+              <span class="sch-spots">15 spots</span>
+            </div>
+            <div class="schedule-row">
+              <span class="sch-time">7:00 PM</span>
+              <div class="sch-dot dot-almost"></div>
+              <span class="sch-class">Pilates Core — Studio A</span>
+              <span class="sch-spots">3 spots</span>
+            </div>
+            <div style="margin-top:1.2rem;display:flex;gap:.8rem">
+              <div style="flex:1;background:rgba(0,194,255,.12);border-radius:8px;padding:.8rem;text-align:center">
+                <div
+                  style="font-family:'Barlow Condensed',sans-serif;font-size:1.6rem;font-weight:800;color:var(--cyan)">
+                  47</div>
+                <div style="font-size:.72rem;color:rgba(255,255,255,.45);margin-top:.2rem">Check-ins today</div>
+              </div>
+              <div style="flex:1;background:rgba(0,194,255,.12);border-radius:8px;padding:.8rem;text-align:center">
+                <div
+                  style="font-family:'Barlow Condensed',sans-serif;font-size:1.6rem;font-weight:800;color:var(--cyan)">6
+                </div>
+                <div style="font-size:.72rem;color:rgba(255,255,255,.45);margin-top:.2rem">Classes running</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MEMBERSHIP PLANS -->
+  <section id="membership">
+    <div class="inner">
+      <div class="plans-header reveal">
+        <div class="section-label">Membership Plans</div>
+        <h2 class="display section-title">Pricing That Grows With You</h2>
+        <p class="section-sub">No hidden fees. Cancel anytime. All plans include a 14-day free trial.</p>
+      </div>
+      <div class="plans-grid">
+        <div class="plan-card reveal reveal-delay-1">
+          <div class="plan-name">Starter</div>
+          <div class="plan-price"><sup>₹</sup>1,999<sub>/mo</sub></div>
+          <div class="plan-desc">Perfect for a single-location gym just getting started with digital management.</div>
+          <ul class="plan-features">
+            <li>Up to 200 active members</li>
+            <li>Class scheduling & bookings</li>
+            <li>Basic billing & invoicing</li>
+            <li>Email notifications</li>
+            <li>Standard dashboard</li>
+          </ul>
+          <button class="plan-btn" onclick="showToast('Starter plan selected!')">Choose Starter</button>
+        </div>
+        <div class="plan-card featured reveal reveal-delay-2">
+          <div class="plan-popular">Most Popular</div>
+          <div class="plan-name">Growth</div>
+          <div class="plan-price"><sup>₹</sup>4,499<sub>/mo</sub></div>
+          <div class="plan-desc">For growing gyms that need automation, analytics, and a member-facing app.</div>
+          <ul class="plan-features">
+            <li>Up to 1,000 active members</li>
+            <li>Everything in Starter</li>
+            <li>WhatsApp & SMS notifications</li>
+            <li>Member mobile app</li>
+            <li>Advanced analytics</li>
+            <li>Access control integration</li>
+            <li>Priority support</li>
+          </ul>
+          <button class="plan-btn" onclick="showToast('Growth plan selected — great choice!')">Choose Growth</button>
+        </div>
+        <div class="plan-card reveal reveal-delay-3">
+          <div class="plan-name">Enterprise</div>
+          <div class="plan-price" style="font-size:2rem;padding-top:.5rem">Custom</div>
+          <div class="plan-desc">Multi-branch chains, franchise networks, and large fitness studios with complex needs.
+          </div>
+          <ul class="plan-features">
+            <li>Unlimited members & branches</li>
+            <li>Everything in Growth</li>
+            <li>Custom branded app</li>
+            <li>API & third-party integrations</li>
+            <li>Dedicated account manager</li>
+            <li>On-site onboarding</li>
+            <li>SLA-backed uptime</li>
+          </ul>
+          <button class="plan-btn" onclick="showToast('Our team will reach out soon!')">Contact Sales</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section id="testimonials">
+    <div class="inner">
+      <div class="test-header reveal">
+        <div class="section-label">Gym Owners Love It</div>
+        <h2 class="display section-title">Real Results, Real Gyms</h2>
+      </div>
+      <div class="test-grid">
+        <div class="test-card reveal reveal-delay-1">
+          <div class="test-stars">★★★★★</div>
+          <p class="test-text">"We reduced no-show rates by 38% in the first month simply because FitCore's reminders
+            actually reach people on WhatsApp. Worth every rupee."</p>
+          <div class="test-author">
+            <div class="test-avatar">VR</div>
+            <div>
+              <div class="test-name">Vikram Rao</div>
+              <div class="test-role">Owner, IronHouse Fitness, Pune</div>
+            </div>
+          </div>
+        </div>
+        <div class="test-card reveal reveal-delay-2">
+          <div class="test-stars">★★★★★</div>
+          <p class="test-text">"Managing three branches from one screen used to be a nightmare. FitCore made it simple —
+            I can see everything happening across all locations live."</p>
+          <div class="test-author">
+            <div class="test-avatar">PS</div>
+            <div>
+              <div class="test-name">Priya Sharma</div>
+              <div class="test-role">Director, FitZone Chain, Mumbai</div>
+            </div>
+          </div>
+        </div>
+        <div class="test-card reveal reveal-delay-3">
+          <div class="test-stars">★★★★★</div>
+          <p class="test-text">"The analytics alone changed how I think about my gym. I could see which classes were
+            underperforming and cut them — revenue went up 22% in two months."</p>
+          <div class="test-author">
+            <div class="test-avatar">AJ</div>
+            <div>
+              <div class="test-name">Arjun Joshi</div>
+              <div class="test-role">Founder, CoreStrength Studio, Nashik</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section id="cta">
+    <div class="inner">
+      <div class="reveal">
+        <div class="section-label" style="color:var(--cyan)">Get Started Today</div>
+        <h2 class="display section-title">Your Gym Deserves Better Software</h2>
+        <p class="section-sub">14-day free trial. No credit card required. Set up in under an hour.</p>
+        <div class="cta-form">
+          <input type="email" class="cta-input" id="emailInput" placeholder="Enter your work email" />
+          <button class="cta-submit" onclick="handleCTA()">Start Free Trial</button>
+        </div>
+        <p style="color:rgba(255,255,255,.35);font-size:.8rem;margin-top:1rem;position:relative">No credit card required
+          · Cancel anytime · Setup support included</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <span class="nav-logo">Fit<span>Core</span></span>
+        <p>The all-in-one gym management platform built for Indian fitness businesses — from single studios to
+          multi-city chains.</p>
+      </div>
+      <div class="footer-col">
+        <h5>Product</h5>
+        <ul>
+          <li><a href="#features">Features</a></li>
+          <li><a href="#membership">Pricing</a></li>
+          <li><a href="#how">How It Works</a></li>
+          <li><a href="#">Integrations</a></li>
+          <li><a href="#">Mobile App</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Company</h5>
+        <ul>
+          <li><a href="#">About Us</a></li>
+          <li><a href="#">Careers</a></li>
+          <li><a href="#">Blog</a></li>
+          <li><a href="#">Press Kit</a></li>
+          <li><a href="#">Contact</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Support</h5>
+        <ul>
+          <li><a href="#">Help Center</a></li>
+          <li><a href="#">API Docs</a></li>
+          <li><a href="#">Status</a></li>
+          <li><a href="#">Privacy Policy</a></li>
+          <li><a href="#">Terms of Service</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 FitCore Technologies Pvt. Ltd. · Made with ♥ in India</span>
+      <div class="social-links">
+        <a href="#">Instagram</a>
+        <a href="#">LinkedIn</a>
+        <a href="#">Twitter</a>
+        <a href="#">YouTube</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    /* Counter animation */
+    function animateCounter(id, end, suffix = '', duration = 1800) {
+      const el = document.getElementById(id);
+      let start = 0, step = end / (duration / 16);
+      const timer = setInterval(() => {
+        start += step;
+        if (start >= end) { el.textContent = end + suffix; clearInterval(timer); }
+        else el.textContent = Math.floor(start) + suffix;
+      }, 16);
+    }
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        animateCounter('ctr-members', 50000, '+');
+        animateCounter('ctr-gyms', 1200, '+');
+        animateCounter('ctr-uptime', 99, '%');
+      }, 600);
+    });
+
+    /* Scroll reveal */
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
+    }, { threshold: 0.12 });
+    reveals.forEach(r => observer.observe(r));
+
+    /* Mobile menu */
+    function toggleMenu() {
+      document.getElementById('mobileMenu').classList.toggle('open');
+    }
+
+    /* Smooth scroll helper */
+    function scrollTo(sel) {
+      document.querySelector(sel).scrollIntoView({ behavior: 'smooth' });
+    }
+
+    /* Navbar color on scroll */
+    window.addEventListener('scroll', () => {
+      document.getElementById('navbar').style.background =
+        window.scrollY > 40 ? 'rgba(10,38,71,.97)' : '#0A2647';
+    });
+
+    /* Toast */
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 3000);
+    }
+
+    /* CTA */
+    function handleCTA() {
+      const email = document.getElementById('emailInput').value.trim();
+      if (!email || !email.includes('@')) {
+        showToast('Please enter a valid email address.');
+        return;
+      }
+      showToast('🎉 Welcome! Check your inbox to get started.');
+      document.getElementById('emailInput').value = '';
+    }
+  </script>
+</body>
+
+</html>
